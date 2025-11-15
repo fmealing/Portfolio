@@ -33,7 +33,7 @@ export default function FitnessCreator() {
 
         <div className="max-w-4xl mx-auto rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-gray-200">
           <Image
-            src="/FitnessCreator/hero.jpg"
+            src="https://storage.googleapis.com/syncmove/Hero-FitnessCreator.jpg"
             alt="Fitness creator"
             width={1800}
             height={1200}
