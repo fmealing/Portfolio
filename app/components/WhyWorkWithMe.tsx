@@ -37,7 +37,7 @@ const points = [
 
 export default function WhyWorkWithMe() {
   return (
-    <SectionWrapper fullHeight id="Why">
+    <SectionWrapper fullHeight>
       <SectionTitle>Why Work With Me</SectionTitle>
 
       {/* MOBILE: premium compact list */}

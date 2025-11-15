@@ -4,7 +4,7 @@ import Portfolio from "./components/Portfolio";
 import WhyWorkWithMe from "./components/WhyWorkWithMe";
 import Pricing from "./components/Pricing";
 import Contact from "./components/Contact";
-import Nav from "./components/Nav";
+
 import DotNav from "./components/DotNav";
 
 export default function Home() {
