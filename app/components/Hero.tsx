@@ -4,115 +4,109 @@ import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-offwhite">
-      {/* --- LAYER 1: Ambient lights --- */}
-      <div className="pointer-events-none absolute inset-0">
-        {/* Top center light */}
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] 
-        bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.18),transparent_70%)]"
-        />
-
-        {/* Bottom right light */}
-        <div
-          className="absolute bottom-0 right-0 w-[700px] h-[500px] 
-        bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_80%)]"
-        />
-
-        {/* Vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle,transparent_60%,rgba(0,0,0,0.05))]" />
-      </div>
-
-      {/* --- LAYER 2: Floating particles (premium micro-motion) --- */}
+    <section className="relative min-h-screen flex items-center bg-black overflow-hidden">
+      {/* BACKGROUND NOISE + PARALLAX DRIFT */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.35 }}
-        transition={{ duration: 2 }}
-        className="absolute inset-0"
-      >
-        <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-accentBlue/30 rounded-full blur-sm animate-pulse"></div>
-        <div className="absolute top-2/3 right-1/4 w-3 h-3 bg-accentBlue/20 rounded-full blur-sm animate-pulse"></div>
-        <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-accentBlue/25 rounded-full blur-sm animate-pulse"></div>
-      </motion.div>
+        animate={{ x: [-5, 5, -5], y: [-5, 5, -5] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.06]"
+      />
 
-      {/* --- LAYER 3: Content --- */}
+      {/* ANIMATED GRADIENT STRIPE */}
+      <motion.div
+        initial={{ x: "-20%" }}
+        animate={{ x: "20%" }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "linear",
+        }}
+        className="absolute top-[35%] left-0 w-full h-[180px] 
+                   bg-gradient-to-r from-accentBlue/20 via-accentBlue/10 to-transparent"
+      />
+
+      {/* CONTENT */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="relative z-10 max-w-4xl mx-auto text-center px-6"
+        transition={{ duration: 1 }}
+        className="relative z-10 max-w-6xl mx-auto px-10 pt-20 pb-24 text-center md:pt-40 md:pb-32 md:text-left"
       >
-        {/* Tag */}
+        {/* SMALL TAG */}
         <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.8 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="text-sm tracking-[0.2em] uppercase text-gray600 mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.7 }}
+          className="text-accentBlue font-semibold tracking-wider uppercase mb-6"
         >
-          Founder of SyncMove • Frontend Developer
+          Founder • Engineer • Builder
         </motion.p>
 
-        {/* Name */}
+        {/* NAME – MASKED REVEAL */}
         <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 1 }}
-          className="font-semibold text-charcoal leading-[1.05] text-[clamp(55px,7vw,95px)] mb-6"
+          initial={{ y: "100%", opacity: 0 }}
+          animate={{ y: "0%", opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+          className="font-extrabold text-white
+             text-[clamp(60px,8vw,130px)] relative mb-10"
         >
-          Florian{" "}
-          <span className="bg-clip-text text-transparent bg-[linear-gradient(90deg,#3b82f6,rgba(59,130,246,0.4))]">
-            Mealing
-          </span>
+          <div className="overflow-hidden">
+            <span className="inline-block">
+              Florian{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accentBlue to-accentBlue/40">
+                Mealing
+              </span>
+            </span>
+          </div>
         </motion.h1>
 
-        {/* Value */}
+        {/* VALUE PROP + UNDERLINE REVEAL */}
+        <div>
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.55 }}
+            className="text-white text-3xl md:text-4xl font-semibold max-w-3xl leading-snug"
+          >
+            I build high-performance websites for founders ready to scale.
+          </motion.p>
+
+          {/* UNDERLINE BAR */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.9, delay: 0.8, ease: "easeOut" }}
+            className="h-[4px] w-28 bg-accentBlue origin-left mt-4 mb-12"
+          />
+        </div>
+
+        {/* SUBTEXT */}
         <motion.p
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, duration: 0.8 }}
-          className="text-2xl text-gray600 max-w-2xl mx-auto mb-6 leading-relaxed"
+          transition={{ duration: 0.9, delay: 0.9 }}
+          className="text-gray-400 text-lg tracking-wide max-w-2xl mb-16"
         >
-          I design and build fast, modern personal websites for creators,
-          founders and early-stage startups.
+          Fast execution. Clean design. Premium experience.
         </motion.p>
 
-        {/* Sub tagline */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.8 }}
-          transition={{ delay: 0.75, duration: 0.8 }}
-          className="text-lg text-gray600 mb-12"
-        >
-          Clean design • Fast delivery • Clear communication
-        </motion.p>
-
-        {/* CTA */}
+        {/* CTA BUTTON */}
         <motion.button
           whileHover={{
             scale: 1.05,
-            boxShadow: "0 12px 32px rgba(59,130,246,0.35)",
+            boxShadow: "0 0 40px rgba(59,130,246,0.5)",
           }}
           whileTap={{ scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 300 }}
           onClick={() => {
             const el = document.getElementById("Contact");
-            if (el) {
-              el.scrollIntoView({ behavior: "smooth" });
-            }
+            if (el) el.scrollIntoView({ behavior: "smooth" });
           }}
-          className="bg-accentBlue text-white px-12 py-5 rounded-xl font-medium text-xl shadow-lg"
+          className="px-12 py-5 rounded-lg font-bold text-xl bg-accentBlue text-white"
         >
           Work With Me
         </motion.button>
-      </motion.div>
-
-      {/* Scroll cue */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.6 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2"
-      >
-        <div className="w-[2px] h-10 bg-gray300 rounded-full animate-pulse"></div>
       </motion.div>
     </section>
   );

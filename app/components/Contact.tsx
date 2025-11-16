@@ -6,67 +6,102 @@ import SectionTitle from "./SectionTitle";
 
 export default function Contact() {
   return (
-    <SectionWrapper fullHeight>
-      <SectionTitle>Let’s Work Together</SectionTitle>
-
+    <SectionWrapper
+      fullHeight
+      className="bg-black text-white relative overflow-hidden"
+    >
+      {/* BACKGROUND NOISE */}
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        animate={{ x: [-4, 4, -4], y: [-3, 3, -3] }}
+        transition={{ repeat: Infinity, duration: 14, ease: "easeInOut" }}
+        className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[url('/noise.png')]"
+      />
+
+      {/* BLUE CENTER GLOW */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent_80%)]" />
+
+      <SectionTitle align="left" underline>
+        Let’s Work Together
+      </SectionTitle>
+
+      {/* TEXT BLOCK */}
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="text-center max-w-lg mx-auto mb-10"
+        className="max-w-3xl mb-14"
       >
-        <p className="text-xl text-gray600 mb-3">
-          Email:{" "}
-          <a
-            href="mailto:florian@syncmove.co.uk"
-            className="text-charcoal hover:text-accentBlue transition-colors font-medium"
-          >
-            florian@syncmove.co.uk
-          </a>
+        <p className="text-2xl text-gray-300 mb-6 leading-snug">
+          If you want a fast, modern, high-performance website that makes you
+          look world-class, let’s build it.
         </p>
 
-        <p className="text-xl text-gray600 mb-3">
-          Instagram:{" "}
-          <a
-            href="https://instagram.com/florian_mealing"
-            target="_blank"
-            className="text-charcoal hover:text-accentBlue transition-colors font-medium"
-          >
-            @florian_mealing
-          </a>
-        </p>
+        {/* Contact info list */}
+        <div className="space-y-3 text-[19px]">
+          <div className="flex items-baseline gap-3">
+            <div className="h-5 w-[3px] bg-accentBlue"></div>
+            <a
+              href="mailto:florian@syncmove.co.uk"
+              className="text-gray-300 hover:text-white font-semibold transition-colors"
+            >
+              florian@syncmove.co.uk
+            </a>
+          </div>
 
-        <p className="text-xl text-gray600">
-          LinkedIn:{" "}
-          <a
-            href="https://linkedin.com/in/florian-mealing"
-            target="_blank"
-            className="text-charcoal hover:text-accentBlue transition-colors font-medium"
-          >
-            linkedin.com/in/florian-mealing
-          </a>
-        </p>
+          <div className="flex items-baseline gap-3">
+            <div className="h-5 w-[3px] bg-accentBlue"></div>
+            <a
+              href="https://instagram.com/florian_mealing"
+              target="_blank"
+              className="text-gray-300 hover:text-white font-semibold transition-colors"
+            >
+              @florian_mealing
+            </a>
+          </div>
+
+          <div className="flex items-baseline gap-3">
+            <div className="h-5 w-[3px] bg-accentBlue"></div>
+            <a
+              href="https://linkedin.com/in/florian-mealing"
+              target="_blank"
+              className="text-gray-300 hover:text-white font-semibold transition-colors"
+            >
+              linkedin.com/in/florian-mealing
+            </a>
+          </div>
+        </div>
       </motion.div>
 
+      {/* CTA BUTTON */}
       <motion.a
         whileHover={{
-          scale: 1.03,
-          boxShadow: "0 8px 24px rgba(59,130,246,0.35)",
+          scale: 1.05,
+          boxShadow: "0 0 40px rgba(59,130,246,0.6)",
         }}
         whileTap={{ scale: 0.97 }}
-        href="mailto:florian@syncmove.co.uk?subject=Project%20Inquiry&body=Hi%20Florian,%0D%0A%0D%0AI'm%20interested%20in%20working%20with%20you.%20Here%20are%20the%20details:%0D%0A-%20Project%20type:%0D%0A-%20Timeline:%0D%0A-%20Budget:%0D%0A%0D%0ABest,%0D%0A"
-        className="bg-accentBlue text-white px-10 py-4 rounded-xl font-medium text-lg shadow-md mx-auto block text-center max-w-[280px] w-full"
+        href="mailto:florian@syncmove.co.uk?subject=Project%20Inquiry&body=Hi%20Florian,%0D%0A%0D%0AMy%20project%20details:%0D%0A-%20Project%20type:%0D%0A-%20Timeline:%0D%0A-%20Budget:%0D%0A%0D%0ABest,%0D%0A"
+        className="
+          mt-2
+          px-12 py-5 
+          bg-accentBlue 
+          rounded-lg 
+          text-lg font-bold
+          text-white 
+          block 
+          w-fit
+        "
       >
-        Let’s Build Your Website
+        Start Your Project
       </motion.a>
 
+      {/* SUBTEXT */}
       <motion.p
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ delay: 0.4, duration: 0.7 }}
-        className="text-center text-gray600 opacity-80 mt-8 text-lg"
+        transition={{ delay: 0.4, duration: 0.8 }}
+        className="text-gray-400 text-lg mt-10"
       >
         I reply fast, usually within the hour.
       </motion.p>
