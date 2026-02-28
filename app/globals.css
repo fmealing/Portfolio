@@ -2,23 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Design tokens ─────────────────────────────────────────── */
+/* ─── Design tokens — phosphor green terminal ─────────────────── */
 :root {
-  --gold:          #c4a84a;
-  --gold-dim:      rgba(196, 168, 74, 0.22);
-  --gold-line:     rgba(196, 168, 74, 0.16);
-  --gold-hover:    rgba(196, 168, 74, 0.32);
+  --green:         #00ff41;                    /* phosphor bright */
+  --green-dim:     rgba(0, 255, 65, 0.18);
+  --green-line:    rgba(0, 255, 65, 0.13);
+  --green-hover:   rgba(0, 255, 65, 0.28);
 
-  --bg:            #0b0900;
-  --surface:       #111009;
-  --card:          #181510;
+  --bg:            #040904;
+  --surface:       #070d07;
+  --card:          #0b130b;
 
-  --cream:         #ede4cb;
-  --cream-dim:     #9a8d77;
-  --cream-muted:   #4f4739;
+  --cream:         #c0dcc0;                    /* phosphor-tinted text */
+  --cream-dim:     #4d734d;                    /* secondary text */
+  --cream-muted:   #28402a;                    /* muted text */
 
-  --border:        rgba(196, 168, 74, 0.1);
-  --border-hover:  rgba(196, 168, 74, 0.28);
+  --border:        rgba(0, 255, 65, 0.09);
+  --border-hover:  rgba(0, 255, 65, 0.26);
+
+  /* legacy aliases (for any remaining references) */
+  --gold:          #00ff41;
+  --gold-dim:      rgba(0, 255, 65, 0.18);
+  --gold-line:     rgba(0, 255, 65, 0.13);
+  --gold-hover:    rgba(0, 255, 65, 0.28);
 }
 
 /* ─── Base ───────────────────────────────────────────────────── */
@@ -31,38 +37,30 @@ html, body {
   font-weight: 300;
 }
 
-/* Thin amber scrollbar */
+/* Thin phosphor scrollbar */
 ::-webkit-scrollbar       { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+::-webkit-scrollbar-thumb { background: var(--green-dim); }
 
 /* ─── Dot-grid background (hero) ─────────────────────────────── */
 .dot-grid {
-  background-image: radial-gradient(rgba(196, 168, 74, 0.13) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px);
   background-size: 26px 26px;
 }
 
-/* ─── Typography helpers ─────────────────────────────────────── */
-
-/* Instrument Serif italic — only for the name and pullquotes */
-.font-display {
-  font-family: var(--font-display), Georgia, serif;
-  font-style: italic;
-}
-
-/* Section eyebrow label */
+/* ─── Section eyebrow label ──────────────────────────────────── */
 .label {
   font-size: 0.65rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--green);
   font-weight: 400;
 }
 
-/* ─── Structural lines ───────────────────────────────────────── */
+/* ─── Structural rules ───────────────────────────────────────── */
 .rule {
   height: 1px;
-  background: var(--gold-line);
+  background: var(--green-line);
 }
 
 /* ─── Project accordion rows ─────────────────────────────────── */
@@ -72,7 +70,7 @@ html, body {
   cursor: pointer;
 }
 .proj-row:hover {
-  background: rgba(196, 168, 74, 0.03);
+  background: rgba(0, 255, 65, 0.025);
 }
 .proj-row:first-child {
   border-top: 1px solid var(--border);
@@ -85,7 +83,7 @@ html, body {
   line-height: 2;
 }
 .skill-item:hover {
-  color: var(--gold);
+  color: var(--green);
 }
 
 /* ─── Contact links ──────────────────────────────────────────── */
@@ -96,4 +94,43 @@ html, body {
 .contact-link:hover {
   border-color: var(--border-hover);
   color: var(--cream);
+}
+
+/* ─── Typewriter cursor ──────────────────────────────────────── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.cursor-blink {
+  animation: blink 1s step-start infinite;
+  color: var(--green);
+  margin-left: 1px;
+  /* block cursor — classic CRT phosphor terminal */
+  font-style: normal;
+}
+
+/* ─── Subtle CRT scanlines — fixed overlay over entire page ─── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.055) 2px,
+    rgba(0, 0, 0, 0.055) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ─── Module grade tiles ─────────────────────────────────────── */
+.grade-tile {
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s ease;
+}
+.grade-tile:hover {
+  border-color: var(--border-hover);
 }

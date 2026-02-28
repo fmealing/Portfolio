@@ -1,6 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { useTypewriter } from "../hooks/useTypewriter";
 
 interface SkillGroup {
   id:     string;
@@ -55,6 +57,10 @@ const groups: SkillGroup[] = [
 ];
 
 export default function Skills() {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const inView = useInView(headingRef, { once: true, margin: "-80px" });
+  const { displayed, done } = useTypewriter("What I work with.", inView, 45, 100);
+
   return (
     <section
       id="skills"
@@ -71,19 +77,17 @@ export default function Skills() {
           transition={{ duration: 0.5 }}
           className="label mb-10"
         >
-          03 / skills
+          &gt; skills
         </motion.p>
 
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.55, delay: 0.08 }}
-          className="font-display mb-14"
-          style={{ fontSize: "clamp(32px, 5vw, 60px)", color: "var(--cream)" }}
+        <h2
+          ref={headingRef}
+          className="font-mono font-semibold mb-14"
+          style={{ fontSize: "clamp(32px, 5vw, 60px)", color: "var(--cream)", minHeight: "1.2em" }}
         >
-          What I work with.
-        </motion.h2>
+          {displayed}
+          {inView && <span className="cursor-blink">█</span>}
+        </h2>
 
         {/* Rule before table */}
         <motion.div

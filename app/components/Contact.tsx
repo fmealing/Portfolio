@@ -1,6 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { useTypewriter } from "../hooks/useTypewriter";
 
 const links = [
   {
@@ -28,6 +30,12 @@ const links = [
 ];
 
 export default function Contact() {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const inView = useInView(headingRef, { once: true, margin: "-80px" });
+  // Two-line heading: type line 1, then line 2
+  const { displayed: line1, done: line1Done } = useTypewriter("Let's build", inView, 50, 100);
+  const { displayed: line2 } = useTypewriter("something real.", line1Done, 50, 60);
+
   return (
     <section
       id="contact"
@@ -44,20 +52,24 @@ export default function Contact() {
           transition={{ duration: 0.5 }}
           className="label mb-10"
         >
-          05 / contact
+          &gt; contact
         </motion.p>
 
-        {/* Serif display line */}
-        <motion.h2
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.65, delay: 0.08, ease: "easeOut" }}
-          className="font-display mb-5"
-          style={{ fontSize: "clamp(38px, 6vw, 80px)", color: "var(--cream)" }}
+        {/* Two-line typewriter heading */}
+        <h2
+          ref={headingRef}
+          className="font-mono font-semibold mb-5"
+          style={{ fontSize: "clamp(38px, 6vw, 80px)", color: "var(--cream)", minHeight: "2.4em" }}
         >
-          Let&apos;s build<br />something real.
-        </motion.h2>
+          <span style={{ display: "block" }}>
+            {line1}
+            {inView && !line1Done && <span className="cursor-blink">█</span>}
+          </span>
+          <span style={{ display: "block" }}>
+            {line2}
+            {line1Done && <span className="cursor-blink">█</span>}
+          </span>
+        </h2>
 
         <motion.p
           initial={{ opacity: 0 }}

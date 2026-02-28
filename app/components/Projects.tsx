@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useTypewriter } from "../hooks/useTypewriter";
 
 interface Project {
   num:         string;
@@ -170,6 +171,10 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
 }
 
 export default function Projects() {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const inView = useInView(headingRef, { once: true, margin: "-80px" });
+  const { displayed, done } = useTypewriter("Things I've built.", inView, 45, 100);
+
   return (
     <section
       id="projects"
@@ -186,19 +191,17 @@ export default function Projects() {
           transition={{ duration: 0.5 }}
           className="label mb-10"
         >
-          02 / projects
+          &gt; projects
         </motion.p>
 
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.55, delay: 0.08 }}
-          className="font-display mb-2"
-          style={{ fontSize: "clamp(32px, 5vw, 60px)", color: "var(--cream)" }}
+        <h2
+          ref={headingRef}
+          className="font-mono font-semibold mb-2"
+          style={{ fontSize: "clamp(32px, 5vw, 60px)", color: "var(--cream)", minHeight: "1.2em" }}
         >
-          Things I&apos;ve built.
-        </motion.h2>
+          {displayed}
+          {inView && <span className="cursor-blink">█</span>}
+        </h2>
 
         <motion.p
           initial={{ opacity: 0 }}

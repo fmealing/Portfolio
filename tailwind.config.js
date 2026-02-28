@@ -4,11 +4,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        // IBM Plex Mono is the global default — everything is monospaced
+        // IBM Plex Mono everywhere — sans and mono both resolve to it.
+        // Weight contrast (300 → 600) handles all typographic hierarchy.
         sans: ["var(--font-mono)", "monospace"],
         mono: ["var(--font-mono)", "monospace"],
-        // Instrument Serif italic only for display moments (hero name, pullquotes)
-        display: ["var(--font-display)", "Georgia", "serif"],
       },
     },
   },
