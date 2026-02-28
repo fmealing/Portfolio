@@ -1,5 +1,6 @@
 import "./globals.css";
 import { IBM_Plex_Mono } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 // IBM Plex Mono — the only font on the site.
 // Weight contrast (300 body vs 600 display) does all the typographic work.
@@ -27,6 +28,7 @@ export default function RootLayout({
         style={{ background: "var(--bg)", color: "var(--cream)" }}
       >
         {children}
+        <GoogleAnalytics gaId="G-GL67M4KBHW" />
       </body>
     </html>
   );
