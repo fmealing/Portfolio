@@ -1,110 +1,147 @@
 "use client";
 
-import { motion } from "framer-motion";
-import SectionWrapper from "./SectionWrapper";
-import SectionTitle from "./SectionTitle";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { useTypewriter } from "../hooks/useTypewriter";
+
+const links = [
+  {
+    label:  "email",
+    value:  "florianmealing@gmail.com",
+    href:   "mailto:florianmealing@gmail.com",
+  },
+  {
+    label:  "linkedin",
+    value:  "linkedin.com/in/florian-mealing",
+    href:   "https://linkedin.com/in/florian-mealing",
+    external: true,
+  },
+  {
+    label:  "github",
+    value:  "github.com/fmealing",
+    href:   "https://github.com/fmealing",
+    external: true,
+  },
+  {
+    label:  "phone",
+    value:  "+44 7836 338399",
+    href:   "tel:+447836338399",
+  },
+];
 
 export default function Contact() {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const inView = useInView(headingRef, { once: true, margin: "-80px" });
+  // Two-line heading: type line 1, then line 2
+  const { displayed: line1, done: line1Done } = useTypewriter("Let's build", inView, 50, 100);
+  const { displayed: line2 } = useTypewriter("something real.", line1Done, 50, 60);
+
   return (
-    <SectionWrapper
-      fullHeight
-      className="bg-black text-white relative overflow-hidden"
+    <section
+      id="contact"
+      className="scroll-mt-20 py-28 px-8"
+      style={{ background: "var(--surface)" }}
     >
-      {/* BACKGROUND NOISE */}
-      <motion.div
-        animate={{ x: [-4, 4, -4], y: [-3, 3, -3] }}
-        transition={{ repeat: Infinity, duration: 14, ease: "easeInOut" }}
-        className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[url('/noise.png')]"
-      />
+      <div className="max-w-6xl mx-auto">
 
-      {/* BLUE CENTER GLOW */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent_80%)]" />
+        {/* Eyebrow */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="label mb-10"
+        >
+          &gt; contact
+        </motion.p>
 
-      <SectionTitle align="left" underline>
-        Let’s Work Together
-      </SectionTitle>
+        {/* Two-line typewriter heading */}
+        <h2
+          ref={headingRef}
+          className="font-mono font-semibold mb-5"
+          style={{ fontSize: "clamp(38px, 6vw, 80px)", color: "var(--cream)", minHeight: "2.4em" }}
+        >
+          <span style={{ display: "block" }}>
+            {line1}
+            {inView && !line1Done && <span className="cursor-blink">█</span>}
+          </span>
+          <span style={{ display: "block" }}>
+            {line2}
+            {line1Done && <span className="cursor-blink">█</span>}
+          </span>
+        </h2>
 
-      {/* TEXT BLOCK */}
-      <motion.div
-        initial={{ opacity: 0, y: 18 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="max-w-3xl mb-14"
-      >
-        <p className="text-2xl text-gray-300 mb-6 leading-snug">
-          If you want a fast, modern, high-performance website that makes you
-          look world-class, let’s build it.
-        </p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.55, delay: 0.18 }}
+          className="text-sm font-light max-w-sm mb-16"
+          style={{ color: "var(--cream-dim)", lineHeight: "1.85" }}
+        >
+          Actively looking for graduate software engineering roles starting
+          2026. If you&apos;re hiring or want to collaborate, reach out.
+        </motion.p>
 
-        {/* Contact info list */}
-        <div className="space-y-3 text-[19px]">
-          <div className="flex items-baseline gap-3">
-            <div className="h-5 w-[3px] bg-accentBlue"></div>
-            <a
-              href="mailto:florian@syncmove.co.uk"
-              className="text-gray-300 hover:text-white font-semibold transition-colors"
+        {/* Rule */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="rule mb-0"
+          style={{ transformOrigin: "left" }}
+        />
+
+        {/* Contact link list */}
+        <div>
+          {links.map((l, i) => (
+            <motion.a
+              key={l.label}
+              href={l.href}
+              target={l.external ? "_blank" : undefined}
+              rel={l.external ? "noopener noreferrer" : undefined}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.25 + i * 0.08 }}
+              className="contact-link flex items-center justify-between py-5 group"
             >
-              florian@syncmove.co.uk
-            </a>
-          </div>
-
-          <div className="flex items-baseline gap-3">
-            <div className="h-5 w-[3px] bg-accentBlue"></div>
-            <a
-              href="https://instagram.com/florian_mealing"
-              target="_blank"
-              className="text-gray-300 hover:text-white font-semibold transition-colors"
-            >
-              @florian_mealing
-            </a>
-          </div>
-
-          <div className="flex items-baseline gap-3">
-            <div className="h-5 w-[3px] bg-accentBlue"></div>
-            <a
-              href="https://linkedin.com/in/florian-mealing"
-              target="_blank"
-              className="text-gray-300 hover:text-white font-semibold transition-colors"
-            >
-              linkedin.com/in/florian-mealing
-            </a>
-          </div>
+              <span
+                className="label group-hover:text-[var(--cream)] transition-colors duration-200"
+                style={{ color: "var(--cream-muted)" }}
+              >
+                {l.label}
+              </span>
+              <span
+                className="text-sm font-light transition-colors duration-200"
+                style={{ color: "var(--cream-dim)" }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--cream)")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--cream-dim)")}
+              >
+                {l.value}
+                {l.external && (
+                  <span className="ml-2" style={{ color: "var(--gold)" }}>
+                    ↗
+                  </span>
+                )}
+              </span>
+            </motion.a>
+          ))}
         </div>
-      </motion.div>
 
-      {/* CTA BUTTON */}
-      <motion.a
-        whileHover={{
-          scale: 1.05,
-          boxShadow: "0 0 40px rgba(59,130,246,0.6)",
-        }}
-        whileTap={{ scale: 0.97 }}
-        href="mailto:florian@syncmove.co.uk?subject=Project%20Inquiry&body=Hi%20Florian,%0D%0A%0D%0AMy%20project%20details:%0D%0A-%20Project%20type:%0D%0A-%20Timeline:%0D%0A-%20Budget:%0D%0A%0D%0ABest,%0D%0A"
-        className="
-          mt-2
-          px-12 py-5 
-          bg-accentBlue 
-          rounded-lg 
-          text-lg font-bold
-          text-white 
-          block 
-          w-fit
-        "
-      >
-        Start Your Project
-      </motion.a>
-
-      {/* SUBTEXT */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.4, duration: 0.8 }}
-        className="text-gray-400 text-lg mt-10"
-      >
-        I reply fast, usually within the hour.
-      </motion.p>
-    </SectionWrapper>
+        {/* Footer */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="mt-20 text-xs font-light"
+          style={{ color: "var(--cream-muted)" }}
+        >
+          Florian Mealing — University of Birmingham — 2026
+        </motion.p>
+      </div>
+    </section>
   );
 }

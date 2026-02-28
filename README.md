@@ -1,37 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Florian Mealing — Portfolio
 
-## Getting Started
+Personal portfolio site for Florian Mealing, MEng Mechatronics & Robotics Engineering student at the University of Birmingham (First Class, 74.76%). Built to showcase embedded systems, full-stack, and robotics projects.
 
-First, run the development server:
+**Live site:** [florianmealing.dev](https://florianmealing.dev) <!-- update when deployed -->
+
+---
+
+## Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v3 + CSS custom properties |
+| Animation | Framer Motion |
+| Font | IBM Plex Mono (300, 400, 500, 600) |
+| Deployment | Vercel |
+
+---
+
+## Design
+
+Phosphor-green terminal aesthetic — monochrome IBM Plex Mono throughout, `#00ff41` on `#040904`. CRT scanlines overlay, typewriter section headings, blinking block cursor, dot-grid hero background.
+
+---
+
+## Sections
+
+- **Hero** — typewriter name reveal with transferring cursor
+- **About** — bio, stats strip, module grade tiles
+- **Projects** — numbered accordion list (5 projects)
+- **Skills** — three-column spec sheet
+- **Experience** — dates-left layout, work + education groups
+- **Contact** — link list with hover effects
+
+---
+
+## Running locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build   # production build
+npm run lint    # ESLint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Projects featured
 
-To learn more about Next.js, take a look at the following resources:
+| # | Project | Stack |
+|---|---------|-------|
+| 01 | [SyncMove](https://github.com/fmealing/SyncMove-App-2) — fitness tracking platform | TypeScript, React, Node.js, React Native |
+| 02 | [IoT Wearable Glove](https://github.com/fmealing/Final-Year-Project) — MEng FYP | ESP32, C++, MQTT, IMU |
+| 03 | [Autonomous Robot Waiter](https://github.com/fmealing/ADP-2025-Botler) — software lead | Robotics, sensor fusion, control systems |
+| 04 | [Wildlife Park Weighing System](https://github.com/fmealing/bwp-idp3) — client build | ESP32, C++, load cells, Supabase |
+| 05 | [Gesture Recognition System](https://github.com/fmealing/Smart-Vision) — computer vision | Python, MediaPipe, OpenCV |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contact
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# Portfolio
+- Email: florianmealing@gmail.com
+- LinkedIn: [linkedin.com/in/florian-mealing](https://linkedin.com/in/florian-mealing)
+- GitHub: [github.com/fmealing](https://github.com/fmealing)
