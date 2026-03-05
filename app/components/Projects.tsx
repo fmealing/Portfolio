@@ -2,62 +2,69 @@
 
 import { useRef, useState } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import Image from "next/image";
 import { useTypewriter } from "../hooks/useTypewriter";
 
 interface Project {
-  num:         string;
-  tag:         string;
-  title:       string;
+  num: string;
+  tag: string;
+  title: string;
   description: string;
-  tech:        string[];
-  github:      string;
+  tech: string[];
+  github: string;
+  image: string;
 }
 
 const projects: Project[] = [
   {
-    num:   "01",
-    tag:   "Founder",
+    num: "01",
+    tag: "Founder",
     title: "SyncMove",
     description:
       "Founded and shipped a production fitness tracking platform end-to-end. REST API in Node.js/TypeScript, React web frontend, React Native mobile app. Designed the full database schema and system architecture from zero.",
-    tech:   ["TypeScript", "React", "Node.js", "React Native", "REST API"],
+    tech: ["TypeScript", "React", "Node.js", "React Native", "REST API"],
     github: "https://github.com/fmealing/SyncMove-App-2",
+    image: "/images/project/SyncMove.png",
   },
   {
-    num:   "02",
-    tag:   "Final Year Project",
+    num: "02",
+    tag: "Final Year Project",
     title: "IoT Wearable Glove",
     description:
       "MEng FYP — a wearable glove using an ESP32, flex sensors, and an IMU for real-time gym rep counting and load tracking. Data streams via MQTT to a cloud database. Hardware prototype fully designed and hand-soldered.",
-    tech:   ["ESP32", "C++", "MQTT", "IMU", "Flex Sensors"],
+    tech: ["ESP32", "C++", "MQTT", "IMU", "Flex Sensors"],
     github: "https://github.com/fmealing/Final-Year-Project",
+    image: "/images/project/IoT Glove.png",
   },
   {
-    num:   "03",
-    tag:   "Software Lead",
+    num: "03",
+    tag: "Software Lead",
     title: "Autonomous Robot Waiter",
     description:
       "Led the software team on a multidisciplinary autonomous robot project. Navigation algorithms, sensor fusion, and motion control systems. Worked across mechanical, electrical, and software sub-teams.",
-    tech:   ["Robotics", "Navigation", "Sensor Fusion", "Control Systems"],
+    tech: ["Robotics", "Navigation", "Sensor Fusion", "Control Systems"],
     github: "https://github.com/fmealing/ADP-2025-Botler",
+    image: "/images/project/Robot Waiter.png",
   },
   {
-    num:   "04",
-    tag:   "Client Build",
+    num: "04",
+    tag: "Client Build",
     title: "Wildlife Park Weighing System",
     description:
       "Automated animal weighing system deployed for a real wildlife park. Custom firmware on ESP32 reads load cell data, applies calibration, and streams weight readings to Supabase in real time.",
-    tech:   ["ESP32", "C++", "Load Cells", "Supabase", "Embedded C"],
+    tech: ["ESP32", "C++", "Load Cells", "Supabase", "Embedded C"],
     github: "https://github.com/fmealing/bwp-idp3",
+    image: "/images/project/Wildlife park.png",
   },
   {
-    num:   "05",
-    tag:   "Computer Vision",
+    num: "05",
+    tag: "Computer Vision",
     title: "Gesture Recognition System",
     description:
       "Real-time hand gesture recognition via MediaPipe and Python. Classifies gestures from live video with low latency. Explores applications in accessibility and human-computer interaction.",
-    tech:   ["Python", "MediaPipe", "OpenCV", "Computer Vision"],
+    tech: ["Python", "MediaPipe", "OpenCV", "Computer Vision"],
     github: "https://github.com/fmealing/Smart-Vision",
+    image: "/images/project/Gesture Recognition.png",
   },
 ];
 
@@ -151,14 +158,37 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
                 {project.description}
               </p>
 
+              {/* CRT phosphor image */}
+              <div
+                className="relative h-72 max-w-2xl rounded-sm overflow-hidden mb-5"
+                style={{ border: "1px solid var(--border)", isolation: "isolate" }}
+              >
+                <Image
+                  src={project.image}
+                  alt={`${project.title} preview`}
+                  fill
+                  className="crt-image"
+                />
+                <div className="crt-phosphor" />
+                <div className="crt-scanlines" />
+                <div className="crt-vignette" />
+                <div className="crt-glow" />
+                <div className="crt-glare" />
+              </div>
+
               <a
                 href={project.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs tracking-[0.14em] uppercase transition-colors duration-200"
                 style={{ color: "var(--gold)" }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--cream)")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--gold)")}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLElement).style.color =
+                    "var(--cream)")
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLElement).style.color = "var(--gold)")
+                }
               >
                 → view on github
               </a>
@@ -173,7 +203,12 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
 export default function Projects() {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const inView = useInView(headingRef, { once: true, margin: "-80px" });
-  const { displayed, done } = useTypewriter("Things I've built.", inView, 45, 100);
+  const { displayed, done } = useTypewriter(
+    "Things I've built.",
+    inView,
+    45,
+    100,
+  );
 
   return (
     <section
@@ -182,7 +217,6 @@ export default function Projects() {
       style={{ background: "var(--bg)" }}
     >
       <div className="max-w-6xl mx-auto">
-
         {/* Eyebrow */}
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -197,7 +231,11 @@ export default function Projects() {
         <h2
           ref={headingRef}
           className="font-mono font-semibold mb-2"
-          style={{ fontSize: "clamp(32px, 5vw, 60px)", color: "var(--cream)", minHeight: "1.2em" }}
+          style={{
+            fontSize: "clamp(32px, 5vw, 60px)",
+            color: "var(--cream)",
+            minHeight: "1.2em",
+          }}
         >
           {displayed}
           {inView && <span className="cursor-blink">█</span>}

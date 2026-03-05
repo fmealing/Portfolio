@@ -83,15 +83,19 @@ export default function Portfolio() {
               {project.description}
             </p>
 
-            {/* Image */}
-            <div className="mt-4 h-40 rounded-lg border border-gray-800 overflow-hidden group-hover:border-accentBlue transition-colors">
+            {/* Image — CRT phosphor monitor */}
+            <div className="mt-4 h-40 rounded-lg border border-gray-800 overflow-hidden group-hover:border-accentBlue transition-colors relative">
               <Image
                 src={project.image}
                 alt={`${project.title} preview`}
                 width={800}
                 height={500}
-                className="object-cover w-full h-full"
+                className="crt-image"
               />
+              <div className="crt-scanlines" />
+              <div className="crt-vignette" />
+              <div className="crt-glow" />
+              <div className="crt-glare" />
             </div>
 
             {/* Link */}
@@ -129,14 +133,18 @@ export default function Portfolio() {
               {project.description}
             </p>
 
-            <div className="mt-4 h-36 rounded-lg border border-gray-800 overflow-hidden">
+            <div className="mt-4 h-36 rounded-lg border border-gray-800 overflow-hidden relative">
               <Image
                 src={project.image}
                 alt={`${project.title} preview`}
                 width={800}
                 height={500}
-                className="object-cover w-full h-full"
+                className="crt-image"
               />
+              <div className="crt-scanlines" />
+              <div className="crt-vignette" />
+              <div className="crt-glow" />
+              <div className="crt-glare" />
             </div>
 
             <Link
