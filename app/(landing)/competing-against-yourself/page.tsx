@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import LandingPage from "../components/LandingPage";
 
 export const metadata: Metadata = {
-  title: "Your only opponent is last week's you. Ghost Glove.",
+  title: "Ghost Glove | Compete Against Yourself",
   description:
     "Stop measuring yourself against strangers. Track your past self and race that instead.",
 };

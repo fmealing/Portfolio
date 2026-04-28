@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import LandingPage from "../components/LandingPage";
 
 export const metadata: Metadata = {
-  title: "By the time you feel it, the damage is already done. Ghost Glove.",
+  title: "Ghost Glove | Form and Injury",
   description:
     "Most lifting injuries aren't accidents. We catch the patterns before your body does.",
 };

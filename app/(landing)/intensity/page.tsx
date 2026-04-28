@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import LandingPage from "../components/LandingPage";
 
 export const metadata: Metadata = {
-  title: "You think you're working hard. The data might disagree. Ghost Glove.",
+  title: "Ghost Glove | Intensity Tracking",
   description:
     "Perceived effort lies. We measure what your output actually looks like so you stop guessing.",
 };

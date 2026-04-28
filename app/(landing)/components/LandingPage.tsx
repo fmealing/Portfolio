@@ -48,7 +48,17 @@ export default function LandingPage({
           _subject: `Ghost Glove: ${variant}`,
         }),
       });
-      setStatus(res.ok ? "done" : "err");
+      if (res.ok) {
+        setStatus("done");
+        // Fire GA4 conversion event — mark "generate_lead" as a conversion in GA4 dashboard
+        (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.(
+          "event",
+          "generate_lead",
+          { page_variant: variant }
+        );
+      } else {
+        setStatus("err");
+      }
     } catch {
       setStatus("err");
     }
