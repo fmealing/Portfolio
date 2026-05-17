@@ -8,6 +8,7 @@ module.exports = {
         // Weight contrast (300 → 600) handles all typographic hierarchy.
         sans: ["var(--font-mono)", "monospace"],
         mono: ["var(--font-mono)", "monospace"],
+        grotesk: ["var(--font-grotesk)", "'Space Grotesk'", "sans-serif"],
       },
     },
   },
