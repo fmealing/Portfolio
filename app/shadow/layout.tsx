@@ -7,12 +7,12 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = {
-  title: "Ghost — Race your past self.",
+  title: "Shadow — Race your past self.",
   description:
-    "Your biggest competition is who you were last month. Ghost tracks your progress so you always know if you're beating yourself.",
+    "Your biggest competition is who you were last month. Shadow tracks your progress so you always know if you're beating yourself.",
 };
 
-export default function GhostLayout({
+export default function ShadowLayout({
   children,
 }: {
   children: React.ReactNode;

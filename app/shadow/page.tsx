@@ -6,7 +6,7 @@ import axios from "axios";
 
 const FORMSPREE = "https://formspree.io/f/mvzdepaa";
 
-export default function GhostPage() {
+export default function ShadowPage() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "err">(
     "idle",
@@ -18,7 +18,7 @@ export default function GhostPage() {
     try {
       await axios.post(
         FORMSPREE,
-        { email, variant: "ghost-app", _subject: "Ghost App: Early Access" },
+        { email, variant: "shadow-app", _subject: "Shadow App: Early Access" },
         { headers: { Accept: "application/json" } },
       );
       setStatus("done");
@@ -36,12 +36,12 @@ export default function GhostPage() {
       <header className="flex flex-col items-center pt-10 pb-4 gap-1 shrink-0">
         <div className="flex items-center gap-3">
           <img
-            src="/images/ghost/Ghost.svg"
-            alt="Ghost"
+            src="/images/shadow/Shadow.svg"
+            alt="Shadow"
             className="w-7 h-[30px]"
           />
           <span className="text-[#E1E2EA] text-xl font-bold tracking-tight">
-            Ghost
+            Shadow
           </span>
         </div>
         <span className="text-[10px] tracking-[0.22em] text-[#3D526A] uppercase">
@@ -59,8 +59,8 @@ export default function GhostPage() {
             style={{ filter: "drop-shadow(0 0 60px rgba(58, 123, 213, 0.4))" }}
           >
             <Image
-              src="/images/ghost/dashboard-portrait.png"
-              alt="Ghost app dashboard"
+              src="/images/shadow/dashboard-portrait.png"
+              alt="Shadow app dashboard"
               fill
               className="object-cover object-top"
               priority
@@ -75,7 +75,7 @@ export default function GhostPage() {
             Your biggest competition is who you were last month.
           </h1>
           <p className="text-[#5E7A94] text-sm leading-relaxed font-light">
-            Ghost tracks your progress so you always know if you&rsquo;re
+            Shadow tracks your progress so you always know if you&rsquo;re
             beating yourself.
           </p>
 
