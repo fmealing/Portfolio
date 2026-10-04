@@ -1,73 +1,282 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
-import { GhostMark } from "./ghost";
+import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { joinEarlyAccess } from "./actions";
+import { checkContact, CONTACT_REQUIRED } from "./contact";
 
 /* ─────────────────────────────────────────────────────────────
-   Waitlist form — posts to Formspree, no page reload
+   Early-access form — a server action writes the row to a
+   Google Sheet, no page reload
    ───────────────────────────────────────────────────────────── */
 
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/mvzdepaa";
+type Status = "idle" | "loading" | "done" | "error";
 
-function WaitlistForm() {
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
-    "idle",
-  );
+type Feedback = {
+  tone: "hint" | "ok" | "error";
+  text: string;
+  /** Offered as a one-tap fix when the text is a handle missing its @. */
+  handle?: string;
+};
+
+const TONE = {
+  hint: "text-[var(--sh-muted)]",
+  ok: "text-[var(--sh-blue-deep)]",
+  error: "text-[var(--sh-error)]",
+};
+
+function EarlyAccessForm() {
+  const reduced = useReducedMotion();
+  const contactRef = useRef<HTMLInputElement>(null);
+
+  const [status, setStatus] = useState<Status>("idle");
+  const [value, setValue] = useState("");
+  // Guidance stays gentle until they leave the field or try to submit.
+  const [touched, setTouched] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [contact, setContact] = useState("");
+
+  const check = checkContact(value);
+
+  let feedback: Feedback | null = null;
+  if (contactError) {
+    feedback = { tone: "error", text: contactError };
+  } else if (check.status === "valid") {
+    feedback = { tone: "ok", text: check.note };
+  } else if (check.status === "invalid") {
+    feedback = { tone: "error", text: check.problem };
+  } else if (check.status === "incomplete") {
+    feedback = touched
+      ? { tone: "error", text: check.problem, handle: check.handle }
+      : { tone: "hint", text: check.note };
+  } else if (touched) {
+    feedback = { tone: "error", text: CONTACT_REQUIRED };
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (check.status !== "valid") {
+      setTouched(true);
+      contactRef.current?.focus();
+      return;
+    }
+
     const form = e.currentTarget;
     setStatus("loading");
+    setFormError(null);
 
     try {
-      const res = await fetch(FORMSPREE_ENDPOINT, {
-        method: "POST",
-        body: new FormData(form),
-        headers: { Accept: "application/json" },
-      });
-      setStatus(res.ok ? "done" : "error");
+      const result = await joinEarlyAccess(new FormData(form));
+      if (result.ok) {
+        setContact(result.contact);
+        setStatus("done");
+      } else {
+        if (result.field === "contact") setContactError(result.error);
+        else setFormError(result.error);
+        setStatus("error");
+      }
     } catch {
+      setFormError("Something went wrong. Please try again.");
       setStatus("error");
     }
   }
 
-  if (status === "done") {
-    return (
-      <p className="sh-mono text-[0.8125rem] text-[var(--sh-blue-lit)]">
-        You&rsquo;re on the list.
-      </p>
-    );
-  }
+  const done = status === "done";
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex w-full max-w-[26rem] flex-col gap-3 sm:flex-row"
-    >
-      <input
-        type="email"
-        name="email"
-        required
-        placeholder="you@example.com"
-        className="sh-mono w-full rounded-lg border px-4 py-3 text-[0.875rem] text-[var(--sh-text)] outline-none transition-colors placeholder:text-[var(--sh-muted)] focus:border-[var(--sh-blue-lit)]"
-        style={{ background: "var(--sh-input)", borderColor: "var(--sh-line)" }}
-      />
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className="sh-mono shrink-0 rounded-lg px-5 py-3 text-[0.75rem] font-medium uppercase tracking-[0.12em] text-[#0D1117] transition-opacity hover:opacity-90 disabled:opacity-60"
-        style={{ background: "var(--sh-blue-lit)" }}
+    <div className="sh-form-box relative">
+      {/* The form keeps its place once submitted so the page never jumps. */}
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className={`relative flex flex-col gap-[var(--sh-gap)] ${done ? "invisible" : ""}`}
       >
-        {status === "loading" ? "Sending…" : "Join the pilot"}
-      </button>
-      {status === "error" && (
-        <p className="sh-mono text-[0.75rem] text-[#93A2B8]">
-          Something went wrong &mdash; try again.
-        </p>
+        <div>
+          <label htmlFor="sh-contact" className="sr-only">
+            Email address or Instagram handle
+          </label>
+          <input
+            ref={contactRef}
+            id="sh-contact"
+            name="contact"
+            type="text"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            required
+            maxLength={254}
+            placeholder="Email or @instagram"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+              setContactError(null);
+            }}
+            onBlur={() => value.trim() && setTouched(true)}
+            aria-invalid={feedback?.tone === "error"}
+            aria-describedby="sh-contact-feedback"
+            className="sh-field"
+          />
+
+          {/* Always in the DOM, so a screen reader hears the feedback change. */}
+          <div id="sh-contact-feedback" aria-live="polite">
+            <AnimatePresence initial={false}>
+              {feedback && (
+                <motion.div
+                  key="feedback"
+                  className="overflow-hidden"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{
+                    duration: reduced ? 0 : 0.2,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <p
+                    className={`flex flex-wrap items-center gap-x-1.5 px-1 pt-1.5 text-[0.8125rem] leading-snug ${TONE[feedback.tone]}`}
+                  >
+                    {feedback.tone === "ok" && (
+                      <svg
+                        width="12"
+                        height="10"
+                        viewBox="0 0 18 14"
+                        fill="none"
+                        aria-hidden
+                      >
+                        <path
+                          d="m1.5 7.5 5 5 10-11"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                    <span>{feedback.text}</span>
+                    {feedback.handle && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setValue(feedback.handle!);
+                          contactRef.current?.focus();
+                        }}
+                        className="font-medium underline underline-offset-2"
+                      >
+                        Use {feedback.handle}
+                      </button>
+                    )}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <label htmlFor="sh-gym" className="sr-only">
+          Your gym (optional)
+        </label>
+        <input
+          id="sh-gym"
+          name="gym"
+          type="text"
+          autoComplete="organization"
+          maxLength={120}
+          placeholder="Your gym (optional)"
+          className="sh-field"
+        />
+
+        {/* Honeypot. Hidden from people, irresistible to bots. */}
+        <div aria-hidden className="absolute h-0 w-0 overflow-hidden">
+          <label htmlFor="sh-website">Website</label>
+          <input
+            id="sh-website"
+            name="website"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="sh-cta"
+        >
+          {status === "loading" ? "Sending…" : "Get early access"}
+          <svg
+            width="16"
+            height="14"
+            viewBox="0 0 16 14"
+            fill="none"
+            aria-hidden
+          >
+            <path
+              d="M1 7h13M8.5 1.5 14 7l-5.5 5.5"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        {/* On wide screens the hero is vertically centred, so the message
+            floats below the button rather than pushing the column up. */}
+        {formError && (
+          <p
+            id="sh-form-error"
+            role="alert"
+            className="px-1 pt-1 text-[0.875rem] leading-snug text-[var(--sh-error)] lg:absolute lg:inset-x-0 lg:top-full lg:pt-3"
+          >
+            {formError}
+          </p>
+        )}
+      </form>
+
+      {done && (
+        <motion.div
+          role="status"
+          className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl border px-6"
+          style={{
+            background: "var(--sh-surface)",
+            borderColor: "var(--sh-line)",
+          }}
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <span
+            className="flex h-10 w-10 items-center justify-center rounded-full text-white"
+            style={{ background: "var(--sh-action)" }}
+          >
+            <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden>
+              <path
+                d="m1.5 7.5 5 5 10-11"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <p className="text-[1.375rem] font-bold leading-tight tracking-[-0.01em]">
+            You&rsquo;re on the list.
+          </p>
+          <p className="text-[0.9375rem] leading-snug text-[var(--sh-muted)]">
+            We&rsquo;ll reach out to{" "}
+            <span className="break-all font-medium text-[var(--sh-ink)]">
+              {contact}
+            </span>{" "}
+            when early access opens.
+          </p>
+        </motion.div>
       )}
-    </form>
+    </div>
   );
 }
 
@@ -78,122 +287,99 @@ function WaitlistForm() {
 export default function ShadowPage() {
   const reduced = useReducedMotion();
 
+  // One load sequence: wordmark, words, form, then the stations arrive.
+  const rise = (delay: number, y = 16) => ({
+    initial: { opacity: 0, y: reduced ? 0 : y },
+    animate: { opacity: 1, y: 0 },
+    transition: {
+      duration: reduced ? 0 : 0.8,
+      delay: reduced ? 0 : delay,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  });
+
   return (
-    <main className="min-h-screen overflow-x-hidden">
-      <div className="mx-auto w-full max-w-[960px] px-6 sm:px-8">
-        {/* ── Masthead ─────────────────────────────────────────── */}
-        <header className="flex items-center justify-between py-7">
-          <div className="flex items-center gap-2.5">
-            <GhostMark size={20} />
-            <span className="text-[1.0625rem] font-semibold tracking-tight">
-              Shadow
-            </span>
-          </div>
-          <span className="sh-mono text-[0.625rem] uppercase tracking-[0.16em] text-[var(--sh-muted)]">
-            Mealing Labs
-          </span>
-        </header>
+    <div className="mx-auto flex min-h-[100svh] w-full max-w-[30rem] flex-col overflow-x-hidden px-[1.625rem] lg:max-w-[1292px] lg:px-12">
+      {/* ── Masthead ─────────────────────────────────────────── */}
+      <motion.header
+        className="flex items-center gap-2 pt-6 lg:gap-3 lg:pl-1 lg:pt-[1.9375rem]"
+        {...rise(0, 0)}
+      >
+        <Image
+          src="/images/shadow/Shadow.svg"
+          alt=""
+          width={180}
+          height={192}
+          priority
+          className="h-[1.4375rem] w-auto lg:h-[1.625rem]"
+        />
+        <span className="text-[1.3125rem] font-bold leading-none text-[var(--sh-blue)] lg:text-[1.5rem]">
+          Shadow
+        </span>
+      </motion.header>
 
-        {/* ── Hero ─────────────────────────────────────────────── */}
-        <section className="grid items-center gap-10 pb-20 pt-12 md:grid-cols-2 md:gap-16 md:pt-20">
-          <motion.div
-            className="relative mx-auto w-[min(240px,68vw)] aspect-[1419/2796] md:mx-0 md:w-full md:max-w-[300px]"
-            style={{ filter: "drop-shadow(0 0 70px rgba(58,123,213,0.28))" }}
-            initial={{ opacity: 0, y: reduced ? 0 : 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: reduced ? 0 : 0.8,
-              delay: reduced ? 0 : 0.2,
-            }}
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <main className="grid flex-1 content-center pb-[1.875rem] pt-[1.1875rem] lg:grid-cols-[448px_minmax(0,1fr)] lg:gap-x-12 lg:pb-10 lg:pt-12">
+        <div className="lg:col-start-1 lg:row-start-1 lg:self-end">
+          <motion.p
+            className="sh-eyebrow text-[0.75rem] lg:text-[0.8125rem] lg:text-[var(--sh-blue-deep)]"
+            {...rise(0.08, 10)}
           >
-            <Image
-              src="/images/shadow/dashboard-portrait.png"
-              alt="Shadow's home screen: last week's ghost beside this week's, with strength, consistency and intensity rings below"
-              fill
-              sizes="(max-width: 768px) 68vw, 300px"
-              className="object-contain"
-              priority
-            />
-          </motion.div>
+            Smart gym screen · Early access
+          </motion.p>
 
-          <div className="flex flex-col items-center gap-7 text-center md:items-start md:text-left">
-            <motion.span
-              className="sh-eyebrow"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: reduced ? 0 : 0.6 }}
-            >
-              Computer vision · Workout tracking
-            </motion.span>
+          <motion.h1
+            className="sh-display mt-[7px] whitespace-nowrap text-[clamp(2.75rem,12.94vw,3.25rem)] lg:-ml-1 lg:mt-[9px] lg:text-[clamp(4rem,5.57vw,5.09375rem)]"
+            {...rise(0.16)}
+          >
+            Get Workout
+            <br />
+            Insights.
+          </motion.h1>
+        </div>
 
-            <motion.h1
-              className="sh-display text-[clamp(2.4rem,5.2vw,3.8rem)] max-w-[13ch]"
-              initial={{ opacity: 0, y: reduced ? 0 : 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: reduced ? 0 : 0.85,
-                delay: reduced ? 0 : 0.1,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            >
-              The only opponent is last week&rsquo;s you
-            </motion.h1>
-
-            <motion.p
-              className="max-w-[42ch] text-[1.0625rem] leading-relaxed text-[#A9B6C9]"
-              initial={{ opacity: 0, y: reduced ? 0 : 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: reduced ? 0 : 0.7,
-                delay: reduced ? 0 : 0.28,
-              }}
-            >
-              Shadow watches your set through your phone camera, counts the reps
-              itself, and puts this week beside last week.
-            </motion.p>
-
-            <motion.div
-              className="flex w-full flex-col items-center gap-3 pt-2 md:items-start"
-              initial={{ opacity: 0, y: reduced ? 0 : 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: reduced ? 0 : 0.7,
-                delay: reduced ? 0 : 0.45,
-              }}
-            >
-              <WaitlistForm />
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ── Footer ───────────────────────────────────────────── */}
-        <footer
-          className="flex flex-wrap items-center justify-between gap-5 border-t py-10"
-          style={{ borderColor: "var(--sh-line)" }}
+        {/* On wide screens the stations shrink with the window's height, so
+            the whole hero stays on one screen. 1.0987 is the art's aspect. */}
+        <motion.div
+          className="mt-[1.625rem] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:w-[min(678px,100%,calc((100svh_-_12.5rem)_*_1.0987))] lg:self-center lg:justify-self-end"
+          {...rise(0.42, 28)}
         >
-          <div className="flex items-center gap-2.5">
-            <GhostMark size={17} />
-            <span className="text-[0.9375rem] font-medium">Shadow</span>
-            <span className="sh-mono text-[0.6875rem] text-[var(--sh-muted)]">
-              by Mealing Labs
-            </span>
-          </div>
-          <div className="flex items-center gap-6">
-            <a
-              href="/shadow/privacy-policy"
-              className="sh-mono text-[0.6875rem] uppercase tracking-[0.14em] text-[var(--sh-muted)] transition-colors hover:text-[var(--sh-blue-lit)]"
-            >
-              Privacy
-            </a>
-            <a
-              href="/"
-              className="sh-mono text-[0.6875rem] uppercase tracking-[0.14em] text-[var(--sh-muted)] transition-colors hover:text-[var(--sh-blue-lit)]"
-            >
-              Florian Mealing
-            </a>
-          </div>
-        </footer>
-      </div>
-    </main>
+          <picture>
+            <source
+              media="(min-width: 1024px)"
+              srcSet="/shadow-station/Stations-Web.svg"
+              width={668}
+              height={608}
+            />
+            <img
+              src="/shadow-station/Stations-Mobile.svg"
+              alt="Three Shadow stations. Two show a live set with a skeleton overlay and a rep count; the middle one shows a set summary with reps, peak joint angles, fatigue and an angle chart."
+              width={346}
+              height={378}
+              fetchPriority="high"
+              className="h-auto w-full"
+            />
+          </picture>
+        </motion.div>
+
+        <motion.div
+          className="mt-5 lg:col-start-1 lg:row-start-2 lg:mt-10 lg:self-start"
+          {...rise(0.28)}
+        >
+          <EarlyAccessForm />
+        </motion.div>
+      </main>
+
+      {/* ── Footer ───────────────────────────────────────────── */}
+      <motion.footer
+        className="sh-quiet pb-5 text-center text-[0.8125rem] text-[var(--sh-muted)] lg:pb-8 lg:text-left"
+        {...rise(0.6, 0)}
+      >
+        Built in Birmingham by{" "}
+        <Link href="/" className="transition-colors hover:text-[var(--sh-blue)]">
+          Florian Mealing
+        </Link>
+      </motion.footer>
+    </div>
   );
 }

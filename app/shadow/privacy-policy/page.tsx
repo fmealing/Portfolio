@@ -49,32 +49,32 @@ const sections: { heading: string; body: string }[] = [
 export default function ShadowPrivacyPolicyPage() {
   return (
     <main
-      className="min-h-screen bg-[#0D1117] text-white overflow-x-hidden"
+      className="min-h-screen overflow-x-hidden text-[var(--sh-ink)]"
       style={{ fontFamily: "var(--font-grotesk), 'Space Grotesk', sans-serif" }}
     >
       <div className="max-w-2xl mx-auto px-6 py-14">
         <a
           href="/shadow"
-          className="text-[#5E7A94] text-xs tracking-wide hover:text-[#3A7BD5] transition-colors"
+          className="text-[var(--sh-muted)] text-xs tracking-wide hover:text-[var(--sh-blue)] transition-colors"
         >
           &larr; Shadow
         </a>
 
-        <h1 className="mt-6 text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="mt-6 text-2xl md:text-3xl font-extrabold tracking-tight text-[var(--sh-ink)]">
           Privacy Policy
         </h1>
-        <p className="mt-2 text-[#5E7A94] text-sm">Effective 25 July 2026</p>
+        <p className="mt-2 text-[var(--sh-muted)] text-sm">Effective 25 July 2026</p>
 
         <div className="mt-10 flex flex-col gap-8">
           {sections.map((section) => (
             <section key={section.heading}>
-              <h2 className="text-[#E1E2EA] text-base font-semibold tracking-tight mb-2">
+              <h2 className="text-[var(--sh-ink)] text-base font-semibold tracking-tight mb-2">
                 {section.heading}
               </h2>
               {section.body.split("\n\n").map((paragraph, i) => (
                 <p
                   key={i}
-                  className="text-[#8B9BB0] text-sm leading-relaxed font-light mb-3 last:mb-0"
+                  className="text-[#4B5768] text-sm leading-relaxed mb-3 last:mb-0"
                 >
                   {paragraph}
                 </p>
@@ -84,7 +84,7 @@ export default function ShadowPrivacyPolicyPage() {
         </div>
       </div>
 
-      <footer className="text-center py-6 px-6 text-[#3D526A] text-xs tracking-wide border-t border-white/[0.04]">
+      <footer className="text-center py-6 px-6 text-[var(--sh-muted)] text-xs tracking-wide border-t border-[var(--sh-line)]">
         Built in public by Florian Mealing
       </footer>
     </main>
