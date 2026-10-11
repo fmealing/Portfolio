@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -27,9 +27,27 @@ const TONE = {
   error: "text-[var(--sh-error)]",
 };
 
+// Gyms and studios are a conversation, not a row in the Sheet.
+const OWNER_MAILTO =
+  "mailto:mealinglabs@gmail.com?subject=Shadow%20at%20my%20gym";
+
+/** Where the build is shared. Offered once someone is on the list. */
+const FOLLOW = [
+  { label: "Instagram", href: "https://www.instagram.com/mealing.labs/" },
+  { label: "TikTok", href: "https://www.tiktok.com/@mealing.labs" },
+];
+
+// A shared link can say where it was shared: /shadow?src=instagram. The page
+// is prerendered, so the tag is only known once it is in a browser.
+const readSrc = () =>
+  new URLSearchParams(window.location.search).get("src") ?? "";
+const noSrc = () => "";
+const never = () => () => {};
+
 function EarlyAccessForm() {
   const reduced = useReducedMotion();
   const contactRef = useRef<HTMLInputElement>(null);
+  const src = useSyncExternalStore(never, readSrc, noSrc);
 
   const [status, setStatus] = useState<Status>("idle");
   const [value, setValue] = useState("");
@@ -38,6 +56,9 @@ function EarlyAccessForm() {
   const [contactError, setContactError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [contact, setContact] = useState("");
+  // On a phone the gym question waits until the first field is in use, so
+  // the form opens as one field and one button. It never closes again.
+  const [started, setStarted] = useState(false);
 
   const check = checkContact(value);
 
@@ -87,12 +108,17 @@ function EarlyAccessForm() {
   const done = status === "done";
 
   return (
-    <div className="sh-form-box relative">
-      {/* The form keeps its place once submitted so the page never jumps. */}
+    <div
+      className="sh-form-box grid grid-cols-1 grid-rows-[minmax(0,1fr)]"
+      data-started={started ? "" : undefined}
+    >
+      {/* The form keeps its place once submitted so the page never jumps.
+          Both share one grid cell, which only grows if the confirmation needs
+          more room than the form had. */}
       <form
         onSubmit={handleSubmit}
         noValidate
-        className={`relative flex flex-col gap-[var(--sh-gap)] ${done ? "invisible" : ""}`}
+        className={`relative col-start-1 row-start-1 flex flex-col gap-[var(--sh-gap)] self-start ${done ? "invisible" : ""}`}
       >
         <div>
           <label htmlFor="sh-contact" className="sr-only">
@@ -115,7 +141,9 @@ function EarlyAccessForm() {
             onChange={(e) => {
               setValue(e.target.value);
               setContactError(null);
+              setStarted(true);
             }}
+            onFocus={() => setStarted(true)}
             onBlur={() => value.trim() && setTouched(true)}
             aria-invalid={feedback?.tone === "error"}
             aria-describedby="sh-contact-feedback"
@@ -177,18 +205,24 @@ function EarlyAccessForm() {
           </div>
         </div>
 
-        <label htmlFor="sh-gym" className="sr-only">
-          Your gym (optional)
-        </label>
-        <input
-          id="sh-gym"
-          name="gym"
-          type="text"
-          autoComplete="organization"
-          maxLength={120}
-          placeholder="Your gym (optional)"
-          className="sh-field"
-        />
+        <div className="sh-later">
+          <div>
+            <label htmlFor="sh-gym" className="sr-only">
+              Your gym and city (optional)
+            </label>
+            <input
+              id="sh-gym"
+              name="gym"
+              type="text"
+              autoComplete="organization"
+              maxLength={120}
+              placeholder="Your gym and city (optional)"
+              className="sh-field"
+            />
+          </div>
+        </div>
+
+        <input type="hidden" name="src" value={src} />
 
         {/* Honeypot. Hidden from people, irresistible to bots. */}
         <div aria-hidden className="absolute h-0 w-0 overflow-hidden">
@@ -226,7 +260,7 @@ function EarlyAccessForm() {
         </button>
 
         {/* On wide screens the hero is vertically centred, so the message
-            floats below the button rather than pushing the column up. */}
+            floats below the form rather than pushing the column up. */}
         {formError && (
           <p
             id="sh-form-error"
@@ -236,12 +270,19 @@ function EarlyAccessForm() {
             {formError}
           </p>
         )}
+
+        <p className="sh-note text-center lg:px-1 lg:text-left">
+          Run a gym or studio?{" "}
+          <a href={OWNER_MAILTO} className="sh-link">
+            Get in touch
+          </a>
+        </p>
       </form>
 
       {done && (
         <motion.div
           role="status"
-          className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl border px-6"
+          className="col-start-1 row-start-1 flex flex-col justify-center gap-3 rounded-2xl border px-6 py-4"
           style={{
             background: "var(--sh-surface)",
             borderColor: "var(--sh-line)",
@@ -274,6 +315,29 @@ function EarlyAccessForm() {
             </span>{" "}
             when early access opens.
           </p>
+
+          <div
+            className="mt-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t pt-3"
+            style={{ borderColor: "var(--sh-line)" }}
+          >
+            <p className="sh-eyebrow text-[0.75rem] text-[var(--sh-muted)]">
+              Follow the build
+            </p>
+            <ul className="flex gap-x-4">
+              {FOLLOW.map(({ label, href }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="sh-link text-[0.9375rem]"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </motion.div>
       )}
     </div>
@@ -302,7 +366,7 @@ export default function ShadowPage() {
     <div className="mx-auto flex min-h-[100svh] w-full max-w-[30rem] flex-col overflow-x-hidden px-[1.625rem] lg:max-w-[1292px] lg:px-12">
       {/* ── Masthead ─────────────────────────────────────────── */}
       <motion.header
-        className="flex items-center gap-2 pt-6 lg:gap-3 lg:pl-1 lg:pt-[1.9375rem]"
+        className="sh-masthead flex items-center gap-2 pt-6 lg:gap-3 lg:pl-1 lg:pt-[1.9375rem]"
         {...rise(0, 0)}
       >
         <Image
@@ -319,7 +383,9 @@ export default function ShadowPage() {
       </motion.header>
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <main className="grid flex-1 content-center pb-[1.875rem] pt-[1.1875rem] lg:grid-cols-[448px_minmax(0,1fr)] lg:gap-x-12 lg:pb-10 lg:pt-12">
+      {/* On wide screens the padding is only a floor: the hero is centred in
+          whatever room the window has, and a short window has little. */}
+      <main className="grid flex-1 content-center pb-[1.875rem] pt-[1.1875rem] lg:grid-cols-[448px_minmax(0,1fr)] lg:gap-x-12 lg:pb-3 lg:pt-5">
         <div className="lg:col-start-1 lg:row-start-1 lg:self-end">
           <motion.p
             className="sh-eyebrow text-[0.75rem] lg:text-[0.8125rem] lg:text-[var(--sh-blue-deep)]"
@@ -329,19 +395,36 @@ export default function ShadowPage() {
           </motion.p>
 
           <motion.h1
-            className="sh-display mt-[7px] whitespace-nowrap text-[clamp(2.75rem,12.94vw,3.25rem)] lg:-ml-1 lg:mt-[9px] lg:text-[clamp(4rem,5.57vw,5.09375rem)]"
+            className="sh-display mt-[7px] whitespace-nowrap text-[clamp(2.75rem,12.94vw,3.25rem)] lg:-ml-1 lg:mt-[9px] lg:text-[clamp(4rem,min(5.57vw,10.5svh),5.09375rem)]"
             {...rise(0.16)}
           >
             Get Workout
             <br />
             Insights.
           </motion.h1>
+
+          <motion.p
+            className="sh-lede mt-3 text-[clamp(0.9375rem,4.1vw,1rem)] lg:mt-5 lg:text-[1.1875rem]"
+            {...rise(0.22)}
+          >
+            A smart screen for the gym floor. It counts your reps, checks your
+            range of motion and tells you when you&rsquo;re slowing down.
+          </motion.p>
         </div>
+
+        {/* Ahead of the stations in the source, so on a phone you reach the
+            form first. Wide screens place both by grid position instead. */}
+        <motion.div
+          className="mt-5 lg:col-start-1 lg:row-start-2 lg:mt-8 lg:self-start"
+          {...rise(0.28)}
+        >
+          <EarlyAccessForm />
+        </motion.div>
 
         {/* On wide screens the stations shrink with the window's height, so
             the whole hero stays on one screen. 1.0987 is the art's aspect. */}
         <motion.div
-          className="mt-[1.625rem] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:w-[min(678px,100%,calc((100svh_-_12.5rem)_*_1.0987))] lg:self-center lg:justify-self-end"
+          className="mt-5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:w-[min(678px,100%,calc((100svh_-_12.5rem)_*_1.0987))] lg:self-center lg:justify-self-end"
           {...rise(0.42, 28)}
         >
           <picture>
@@ -361,18 +444,11 @@ export default function ShadowPage() {
             />
           </picture>
         </motion.div>
-
-        <motion.div
-          className="mt-5 lg:col-start-1 lg:row-start-2 lg:mt-10 lg:self-start"
-          {...rise(0.28)}
-        >
-          <EarlyAccessForm />
-        </motion.div>
       </main>
 
       {/* ── Footer ───────────────────────────────────────────── */}
       <motion.footer
-        className="sh-quiet pb-5 text-center text-[0.8125rem] text-[var(--sh-muted)] lg:pb-8 lg:text-left"
+        className="sh-credit sh-quiet pb-5 text-center text-[0.8125rem] text-[var(--sh-muted)] lg:pb-8 lg:text-left"
         {...rise(0.6, 0)}
       >
         Built in Birmingham by{" "}

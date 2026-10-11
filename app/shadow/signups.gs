@@ -16,7 +16,7 @@
  */
 
 const SHEET_NAME = "Signups";
-const HEADERS = ["Signed up", "Contact", "Type", "Gym"];
+const HEADERS = ["Signed up", "Contact", "Type", "Gym", "Source"];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -31,12 +31,16 @@ function doPost(e) {
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(HEADERS);
       sheet.setFrozenRows(1);
+    } else if (!sheet.getRange(1, HEADERS.length).getValue()) {
+      // A sheet from before the last column existed: give it its heading.
+      sheet.getRange(1, HEADERS.length).setValue(HEADERS[HEADERS.length - 1]);
     }
     sheet.appendRow([
       new Date(),
       asText(data.contact),
       asText(data.kind),
       asText(data.gym),
+      asText(data.src),
     ]);
 
     return respond({ ok: true });

@@ -1,0 +1,1 @@
+Shadow, a smart gym screen: three stations showing live rep counting with a skeleton overlay and a set summary with range of motion and fatigue.

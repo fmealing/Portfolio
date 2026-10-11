@@ -49,6 +49,14 @@ export async function joinEarlyAccess(
     .trim()
     .slice(0, 120);
 
+  // Where the link was shared, from its ?src= tag. Kept to a plain slug so
+  // "Instagram" and "instagram" land in the Sheet as the same source.
+  const src = field("src")
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+
   const url = process.env.SHADOW_SIGNUP_SHEET_URL;
   if (!url) {
     console.error("[shadow] SHADOW_SIGNUP_SHEET_URL is not set; sign-up dropped.");
@@ -62,7 +70,12 @@ export async function joinEarlyAccess(
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contact: contact.value, kind: contact.kind, gym }),
+      body: JSON.stringify({
+        contact: contact.value,
+        kind: contact.kind,
+        gym,
+        src,
+      }),
       // A warm script answers in 2-3s, but a cold one can take well over 10.
       // Keep this under maxDuration in layout.tsx.
       signal: AbortSignal.timeout(25_000),

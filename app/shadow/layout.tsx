@@ -1,4 +1,4 @@
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, DM_Sans } from "next/font/google";
 
 // Space Grotesk is the app's own typeface. Keeping it here means the page and
@@ -16,10 +16,26 @@ const dmSans = DM_Sans({
   variable: "--font-dm",
 });
 
-export const metadata = {
-  title: "Shadow: get workout insights",
-  description:
-    "Shadow is a smart gym screen that counts your reps and shows your range of motion and fatigue after every set. Sign up for early access.",
+const title = "Shadow: get workout insights";
+const description =
+  "Shadow is a smart gym screen that counts your reps and shows your range of motion and fatigue after every set. Sign up for early access.";
+
+export const metadata: Metadata = {
+  // The bare domain redirects to www, and a link preview needs the image's
+  // final address, so the www one is spelled out.
+  metadataBase: new URL("https://www.florianmealing.com"),
+  title,
+  description,
+  // The picture itself is opengraph-image.jpg, next to this file.
+  openGraph: {
+    type: "website",
+    url: "/shadow",
+    siteName: "Shadow",
+    title,
+    description,
+    locale: "en_GB",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 // The sign-up action waits on Google Apps Script, which is slow when cold.
@@ -61,6 +77,8 @@ export default function ShadowLayout({
           --sh-action-deep: #2F6AE4;
 
           --sh-ink:         #333333;
+          /* Running sentences: softer than ink, firmer than a label. */
+          --sh-body:        #566378;
           --sh-muted:       #64748B;
           --sh-placeholder: #8A94A6;
           --sh-line:        #D5DCE6;
@@ -69,6 +87,7 @@ export default function ShadowLayout({
           /* Control sizes are tokens so the form's footprint can be worked out. */
           --sh-field-h: 3.375rem;
           --sh-cta-h:   3.5rem;
+          --sh-note-h:  1.5rem;
           --sh-gap:     0.625rem;
 
           --sh-mono: var(--font-mono), ui-monospace, monospace;
@@ -104,6 +123,25 @@ export default function ShadowLayout({
         }
 
         .sh-root .sh-quiet { font-family: var(--sh-quiet); }
+
+        .sh-root .sh-lede {
+          line-height: 1.5;
+          color: var(--sh-body);
+          text-wrap: pretty;
+        }
+
+        .sh-root .sh-link {
+          font-weight: 500;
+          color: var(--sh-blue-deep);
+          text-decoration: underline;
+          text-decoration-color: rgba(46,98,170,0.35);
+          text-underline-offset: 3px;
+          transition: color 160ms ease, text-decoration-color 160ms ease;
+        }
+        .sh-root .sh-link:hover {
+          color: var(--sh-action-deep);
+          text-decoration-color: currentColor;
+        }
 
         /* ── Sign-up controls ────────────────────────────────────────── */
         .sh-root .sh-field {
@@ -151,18 +189,67 @@ export default function ShadowLayout({
         .sh-root .sh-cta svg { transition: transform 200ms ease; }
         .sh-root .sh-cta:hover:not(:disabled) svg { transform: translateX(4px); }
 
+        /* On a phone the second field stays folded away until the first is
+           in use (data-started), so the form opens as one field and one
+           button. The inner padding keeps the focus ring from being clipped. */
+        @media (max-width: 1023px) {
+          .sh-root .sh-later {
+            display: grid;
+            grid-template-rows: 0fr;
+            margin-bottom: calc(var(--sh-gap) * -1);
+            opacity: 0;
+            visibility: hidden;
+            transition:
+              grid-template-rows 320ms cubic-bezier(0.22, 1, 0.36, 1),
+              margin-bottom 320ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 200ms ease,
+              visibility 0s linear 320ms;
+          }
+          .sh-root .sh-later > div {
+            min-height: 0;
+            overflow: hidden;
+            padding: 5px;
+            margin: -5px;
+          }
+          /* inherit, not visible: once the form is hidden behind the
+             confirmation, this field has to go with it. */
+          .sh-root [data-started] .sh-later {
+            grid-template-rows: 1fr;
+            margin-bottom: 0;
+            opacity: 1;
+            visibility: inherit;
+            transition-delay: 0s;
+          }
+        }
+
+        /* The one line under the button. A fixed height, like the controls. */
+        .sh-root .sh-note {
+          height: var(--sh-note-h);
+          line-height: var(--sh-note-h);
+          font-size: 0.875rem;
+          color: var(--sh-body);
+          white-space: nowrap;
+        }
+
         @media (min-width: 1024px) {
           .sh-root .sh-eyebrow { letter-spacing: 0.01em; }
-          .sh-root { --sh-field-h: 3.5625rem; --sh-cta-h: 3.75rem; }
+          .sh-root { --sh-field-h: 3.5625rem; --sh-cta-h: 3.75rem; --sh-note-h: 1.75rem; }
         }
 
         /* Where the hero is vertically centred, hold the form's footprint at
            its resting size. Feedback under a field then pushes the rest of
            the form down instead of re-centring the whole column. */
-        @media (min-width: 1024px) and (min-height: 700px) {
+        @media (min-width: 1024px) and (min-height: 760px) {
           .sh-root .sh-form-box {
-            height: calc(var(--sh-field-h) * 2 + var(--sh-cta-h) + var(--sh-gap) * 2);
+            height: calc(var(--sh-field-h) * 2 + var(--sh-cta-h) + var(--sh-note-h) + var(--sh-gap) * 3);
           }
+        }
+
+        /* A wide window that is short: tuck the wordmark and the credit in,
+           so the hero still fits on one screen. */
+        @media (min-width: 1024px) and (max-height: 759px) {
+          .sh-root .sh-masthead { padding-top: 1.125rem; }
+          .sh-root .sh-credit { padding-bottom: 1.125rem; }
         }
 
         @media (prefers-reduced-motion: reduce) {
